@@ -1,7 +1,7 @@
 # ez-mc
 Quick and easy Monte Carlo simulations
 
-Example input file (`confg.cfg`):
+Example input file (`config.cfg`):
 ```
 # MC steps (int)
 nstep       100000
@@ -24,4 +24,4 @@ psfname     test.psf
 dcdname     test.dcd
 ```
 
-Once build the program with `make` command in the root folder, run with `./ez-mc confg.cfg`
+Once build the program with `make` command in the root folder, run with `./ez-mc config.cfg`
