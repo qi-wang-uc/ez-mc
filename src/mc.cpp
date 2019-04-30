@@ -3,6 +3,7 @@
 #include <fstream>
 #include <random>
 #include <cmath>
+#include <ctime>
 #include <stdlib.h>
 #include "../include/mc.hpp"
 #include "../include/define.hpp"
@@ -109,16 +110,18 @@ void run_monte_carlo(MCsystem& mc_system, const Config& config) {
     /* Initialize output files with headers */
     std::cout << "RUNMC> Starting Monte Carlo simulation." << std::endl << std::endl;
     std::ofstream log_file(config.log_name);
-    log_file << std::setw(20) << "#STEPS" << " "
-             << std::setw(20) << "ENERGY" << " "
-             << std::setw(20) << "RNDRES" << " "
-             << std::setw(20) << "TRIALS" << std::endl;
+    log_file << std::setw(12) << "#Step" << " "
+             << std::setw(12) << "Trials" << " "
+             << std::setw(12) << "Energy" << " "
+             << std::setw(12) << "Step size" << " "
+             << std::setw(12) << "Accept raio" << " "
+             << std::endl;
     std::ofstream dcd_file(config.dcd_name, std::ios::binary);
     write_dcdheader( dcd_file, DCD_Header(
             static_cast<int32_t>(mc_system.size()),
-            static_cast<int32_t>(config.nstep/config.nsavc),
+            static_cast<int32_t>(config.nstep/config.fsavc),
             static_cast<int32_t>(0),
-            static_cast<int32_t>(config.nsavc),
+            static_cast<int32_t>(config.fsavc),
             static_cast<int32_t>(config.nstep),
             static_cast<int32_t>(0),
             static_cast<float>(1.0),
@@ -126,30 +129,37 @@ void run_monte_carlo(MCsystem& mc_system, const Config& config) {
             static_cast<const char*>(("REMARK CREATED BY " + STR(getenv("USER"))).c_str()))
     );
     /* Set up random numbers */
-    std::default_random_engine rand_gen;
+    std::mt19937_64 rand_gen(time(0));
     std::uniform_int_distribution<>  ud_int(0, mc_system.size()-1);
     std::uniform_real_distribution<> ud_real(0.0, 1.0);
     /* MC begin */
-    REAL e_new, e_old;
+    REAL e_new, e_old, p_accept, step_size=1.0/MATH_E;
+    bool is_adaptive_size = true;
+    if (config.nsize > 0.0) {
+        is_adaptive_size = false;
+        step_size = config.nsize;
+    }
+    INT  overall_trial_counter = 0;
     for(INT istep=1; istep<=config.nstep; ++istep) {
         std::cout << "\e[A" <<"RUNMC> "
                   << std::fixed << std::setw(6) << std::setprecision(2)
-                  << static_cast<REAL>(istep)*100/config.nstep << "% Done."
+                  << istep*100.0 / config.nstep << "% Done."
                   << std::endl;
 
         /* Generate a random move for a random bead */
-        bool success_trial = false;
         ResVec incr_vec;
-        INT ntrials = 0;
+        INT  step_trial_counter = 0;
+        bool success_trial = false;
         while(!success_trial) {
-            INT trial_counter = 0;
-            INT rand_bead = ud_int(rand_gen);
-            while(trial_counter++ < MAXTRIAL) {
+            /* Generate a random bead and count its trials */
+            INT rand_bead = ud_int(rand_gen); 
+            INT bead_trial_counter = 0;
+            while(bead_trial_counter++ < MAXTRIAL) {
                 auto phi   = 2.0*MATHPI*ud_real(rand_gen);
                 auto theta = acos(2.0*ud_real(rand_gen)-1.0);
-                incr_vec   = ResVec(rand_bead, config.zstep*sin(theta)*cos(phi), 
-                                               config.zstep*sin(theta)*sin(phi), 
-                                               config.zstep*cos(theta));
+                incr_vec   = ResVec(rand_bead, step_size*sin(theta)*cos(phi), 
+                                               step_size*sin(theta)*sin(phi), 
+                                               step_size*cos(theta));
                 if (mc_system.has_overlap(incr_vec)) continue;
                 if (mc_system.has_badbond(incr_vec)) continue;
                 e_new = calc_energy(mc_system);
@@ -158,21 +168,37 @@ void run_monte_carlo(MCsystem& mc_system, const Config& config) {
                     break;
                 }
             }
-            ntrials = trial_counter;
+            step_trial_counter += bead_trial_counter;
         }
+        overall_trial_counter += step_trial_counter;
         e_old = e_new;
         mc_system.update(incr_vec);
 
-        /* Write energy and coordinates */
-        if(0==istep%config.nsavc) {
+        /* Update MC step size */
+        if(0==istep%config.fsize && is_adaptive_size) {
+            p_accept  = 1.0*config.fsize/overall_trial_counter;
+            step_size = calc_stepsize(step_size, p_accept, config.idacc);
+            overall_trial_counter = 0;
+        }
+
+        /* Write binary coordinates */
+        if(0==istep%config.fsavc) {
             write_dcdframe(dcd_file, mc_system.size(),
                            mc_system.x(), mc_system.y(), mc_system.z());
         }
-        if(0==istep%config.nsavl) {
-            log_file << std::setw(20) << istep << " "
-                     << std::setw(20) << e_old << " "
-                     << std::setw(20) << incr_vec.id+1 << " "
-                     << std::setw(20) << ntrials << std::endl;
+
+        /* Write log file upon request */
+        if(0==istep%config.fsavl) {
+            log_file << std::right << std::fixed
+                     << std::setw(12) << istep << " "
+                     << std::setw(12) << step_trial_counter << " "
+                     << std::setprecision(6)
+                     << std::setw(12) << e_old << " "
+                     << std::setprecision(6)
+                     << std::setw(12) << step_size << " "
+                     << std::setprecision(6)
+                     << std::setw(12) << p_accept  << " "
+                     << std::endl;
         }
     }
     log_file.close();
@@ -183,5 +209,9 @@ bool pass_metropolis_crit(const REAL& e_new, const REAL& e_old) {
     if (e_new < e_old) return true;
     std::default_random_engine rand_gen;
     std::uniform_real_distribution<> ud_real(0.0, 1.0);
-    return exp(e_new-e_old) > ud_real(rand_gen);
+    return std::exp(BETA*(e_new-e_old)) > ud_real(rand_gen);
+}
+
+REAL calc_stepsize(const REAL& delta_old, const REAL& p_old, const REAL& p_ideal) {
+    return delta_old*(std::log(COEFF_A*p_ideal+COEFF_B)/std::log(COEFF_A*p_old+COEFF_B));
 }

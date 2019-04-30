@@ -5,6 +5,10 @@
 #include "config.hpp"
 #include "define.hpp"
 
+/* Coefficients for Acceptance Ration Method */
+const REAL COEFF_A = 0.672924;
+const REAL COEFF_B = 0.064428;
+
 /* Didn't implement too much. 
    Just for cleaner code. */
 struct ResVec {
@@ -45,5 +49,6 @@ class MCsystem {
 
 void run_monte_carlo(MCsystem& mc_system, const Config& config);
 bool pass_metropolis_crit(const REAL& e_new, const REAL& e_old);
+REAL calc_stepsize(const REAL& delta_old, const REAL& p_old, const REAL& p_ideal);
 
 #endif

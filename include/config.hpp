@@ -6,11 +6,13 @@
 class Config{
 public:
     /* input */
-    INT  nstep;
-    INT  nsavc;
-    INT  nsavl;
-    REAL zstep;
-    STR  fasta;
+    INT  nstep = 0; /* Total MC steps */
+    INT  fsize = 0; /* frequency to update MC size */
+    INT  fsavc = 0; /* frequency to save coordinate */
+    INT  fsavl = 0; /* freqeuncy to save log file */
+    STR  fasta; /* input file name for fasta sequence */
+    REAL nsize = 0.0; /* Constant step size */
+    REAL idacc = 0.5; /* Ideal accept rate for adaptive MC step size */
 
     /* output */
     STR log_name;
