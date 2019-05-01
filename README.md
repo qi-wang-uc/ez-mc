@@ -55,7 +55,7 @@ The fasta file for the beta-hairpin is
 GEWTYDDATKTFTVTE
 ```
 
-Below is a short demo, where the peptide was initially built along X-axis then equilibrated after one million steps:
+Below is a short demo, where the peptide was initially built along X-axis then equilibrated after 100M steps:
 
 <img src="demo/beta.gif" width="40%" hight="40%"/>
 
