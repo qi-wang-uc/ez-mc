@@ -13,7 +13,7 @@ The step size (`nsize`) will be updated adaptively (controlled by `fsize` and `i
 
 *Notes*:
 1. This program is heuristic - it only gives an easy demonstration with Monte Carlo simulation and might be adapted for interaction energy parameterization.
-2. Pair-wise interaction[3] were used for energy calculation, which might not be ideal for current application[4].
+2. Pairwise interaction[3] were used for energy calculation, which has been suggested nonideal for current application[4].
 
 ### Usage and example
 1. Build the program with `make` command in the root directory.
