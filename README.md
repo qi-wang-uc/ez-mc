@@ -14,6 +14,7 @@ The step size (`nsize`) will be updated adaptively (controlled by `fsize` and `i
 *Notes*:
 1. This program is heuristic - it only gives an easy demonstration with Monte Carlo simulation and might be adapted for interaction energy parameterization.
 2. Pairwise interaction[3] were used for energy calculation, which has been suggested nonideal for current application[4].
+3. Advanced application of the pairwise potential has been reported elsewhere[5].
 
 ### Usage and example
 1. Build the program with `make` command in the root directory.
@@ -70,3 +71,5 @@ As expected, the acceptance ratio is populated with an average value of `0.49998
 [3] Miyazawa, Sanzo, and Robert L. Jernigan. "Estimation of effective interresidue contact energies from protein crystal structures: quasi-chemical approximation." Macromolecules 18.3 (1985): 534-552.
 
 [4] Vendruscolo, Michele, and Eytan Domany. "Pairwise contact potentials are unsuitable for protein folding." The Journal of chemical physics 109.24 (1998): 11101-11108.
+
+[5] Leonhard, K., J. M. Prausnitz, and C. J. Radke. "3D-lattice Monte Carlo simulations of model proteins. Size effects on folding thermodynamics and kinetics." Biophysical chemistry 106.1 (2003): 81-89.
