@@ -2,18 +2,18 @@
 Quick and easy Monte Carlo simulations
 
 ### Metropolis Criterion Monte Carlo
-The acceptance criterion are determined with Metropolis Criterion:
+The acceptance criterion are determined with Metropolis Criterion[1]:
 
 <img src="demo/eqn/eqn1.png"/>
 
 
-The step size (`nsize`) will be updated adaptively (controlled by `fsize` and `idacc`) if not specified according to ref[1]:
+The step size (`nsize`) will be updated adaptively (controlled by `fsize` and `idacc`) if not specified according to ref[2]:
 
 <img src="demo/eqn/eqn2.png"/>
 
 *Notes*:
 1. This program is heuristic - it only gives an easy demonstration with Monte Carlo simulation and might be adapted for interaction energy parameterization.
-2. Pair-wise interaction[2] were used for energy calculation, which might not be ideal for current application[3].
+2. Pair-wise interaction[3] were used for energy calculation, which might not be ideal for current application[4].
 
 ### Usage and example
 1. Build the program with `make` command in the root directory.
@@ -63,8 +63,10 @@ As expected, the acceptance ratio is populated with an average value of `0.49998
 <img src="demo/pacc-step-hist.png" width="50%"/>
 
 ### Reference
-[1] Swendsen, Robert H. "How the maximum step size in Monte Carlo simulations should be adjusted." Physics Procedia 15 (2011): 81-86.
+[1] https://sites.engineering.ucsb.edu/~shell/che210d/Monte_Carlo.pdf
 
-[2] Miyazawa, Sanzo, and Robert L. Jernigan. "Estimation of effective interresidue contact energies from protein crystal structures: quasi-chemical approximation." Macromolecules 18.3 (1985): 534-552.
+[2] Swendsen, Robert H. "How the maximum step size in Monte Carlo simulations should be adjusted." Physics Procedia 15 (2011): 81-86.
 
-[3] Vendruscolo, Michele, and Eytan Domany. "Pairwise contact potentials are unsuitable for protein folding." The Journal of chemical physics 109.24 (1998): 11101-11108.
+[3] Miyazawa, Sanzo, and Robert L. Jernigan. "Estimation of effective interresidue contact energies from protein crystal structures: quasi-chemical approximation." Macromolecules 18.3 (1985): 534-552.
+
+[4] Vendruscolo, Michele, and Eytan Domany. "Pairwise contact potentials are unsuitable for protein folding." The Journal of chemical physics 109.24 (1998): 11101-11108.
