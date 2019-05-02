@@ -53,15 +53,15 @@ dcdname     1pgb.dcd
 
 Below is a short demo, where the peptide was initially built along X-axis then equilibrated after 100M steps:
 
-<img src="demo/demo.gif" width="50%"/>
+<img src="demo/demo.gif" width="60%"/>
 
 The system is gradually relaxed when examining the time evolution of energy:
 
-<img src="demo/ener-step.png" width="50%"/>
+<img src="demo/ener-step.png" width="60%"/>
 
 As expected, the acceptance ratio is populated with an average value of `0.49998`, while the values of adaptive step size are fluctuating around `0.22275`.
 
-<img src="demo/pacc-step-hist.png" width="50%"/>
+<img src="demo/pacc-step-hist.png" width="60%"/>
 
 ### Reference
 [1] https://sites.engineering.ucsb.edu/~shell/che210d/Monte_Carlo.pdf
