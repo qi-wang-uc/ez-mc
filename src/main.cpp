@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     auto tock = TimeStamp::now();
 
-	time_elapsed(tick, tock);
+    time_elapsed(tick, tock);
     
     return 0;
 }
